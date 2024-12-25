@@ -4,6 +4,7 @@ import { likeDataProps } from './like.interface.ts';
 export interface ProductInitialStateProps {
     loading: boolean;
     products: productDataProps[] | [];
+    product: productDataProps | null;
 
     currentPage: number;
     pageCount: number;

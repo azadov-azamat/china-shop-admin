@@ -44,7 +44,7 @@ export const variableSlice = createSlice({
         builder.addCase(getUsers.rejected, (state: InitialStateProps, action) => {
             state.users = []
             state.loading = false
-            console.error(action.payload)
+            console.error(action.payload);
         })
     }
 })

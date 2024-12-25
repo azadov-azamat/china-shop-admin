@@ -44,17 +44,17 @@ export const authSlice = createSlice({
         builder.addCase(login.pending, (state: AuthInitialProps) => {
             state.loading = true;
         })
-        builder.addCase(login.rejected, (state: AuthInitialProps, action) => {
+        builder.addCase(login.rejected, (state: AuthInitialProps) => {
             state.loading = false;
-            console.error(action);
+            authenticate(state, null, null);
         })
         builder.addCase(getUserMe.fulfilled, (state: AuthInitialProps, action) => {
             state.loading = false
             state.user = action.payload
         })
-        builder.addCase(getUserMe.rejected, (state: AuthInitialProps, action) => {
+        builder.addCase(getUserMe.rejected, (state: AuthInitialProps) => {
             state.loading = false
-            console.error(action.payload)
+            authenticate(state, null, null);
         })
     }
 })

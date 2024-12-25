@@ -9,7 +9,7 @@ import SignUp from './pages/Authentication/SignUp';
 import Chart from './pages/Chart';
 import FormElements from './pages/Form/FormElements';
 import FormLayout from './pages/Form/FormLayout';
-import Profile from './pages/Profile';
+// import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 // import Tables from './pages/Tables';
 import Alerts from './pages/UiElements/Alerts';
@@ -19,6 +19,10 @@ import UsersController from './pages/users';
 import LoginController from './pages/login';
 import CommentsController from './pages/comments';
 import ProductsController from './pages/products';
+
+import 'react-toastify/dist/ReactToastify.css';
+import 'react-toastify/scss/main.scss';
+import ProductCreateController from './pages/products/create';
 
 function App() {
   // const [loading, setLoading] = useState<boolean>(true);
@@ -48,7 +52,11 @@ function App() {
       title: 'Products | TailAdmin - Tailwind CSS Admin Dashboard Template',
       component: <ProductsController />
     },
-    { path: '/profile', title: 'Profile | TailAdmin - Tailwind CSS Admin Dashboard Template', component: <Profile /> },
+    {
+      path: '/products/:action',
+      title: 'Product | TailAdmin - Tailwind CSS Admin Dashboard Template',
+      component: <ProductCreateController />
+    },
     {
       path: '/forms/form-elements',
       title: 'Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template',

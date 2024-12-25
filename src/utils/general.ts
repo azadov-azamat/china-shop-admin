@@ -9,7 +9,7 @@ export function deserialize(models: unknown) {
     return DefaultDeserializer.deserialize(models);
 }
 
-export function authenticate(state: AuthInitialProps, data: AuthDataProps, id: string) {
+export function authenticate(state: AuthInitialProps, data: AuthDataProps | null, id: string | null) {
     state.auth = data;
     localStorage.setItem('authenticate', JSON.stringify({...data, id}));
 }

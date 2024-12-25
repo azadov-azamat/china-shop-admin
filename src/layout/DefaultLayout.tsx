@@ -3,11 +3,20 @@ import Header from '../components/Header/index';
 import Sidebar from '../components/Sidebar/index';
 import useAuth from '../hooks/auth.ts';
 import Loader from '../common/Loader';
+// import { useNavigate } from 'react-router-dom';
 
 const DefaultLayout: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const { load } = useAuth();
+
+  const { load, error } = useAuth();
+  // const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log();
+
+  React.useEffect(() => {
+    // if (error) {
+    //   navigate('/login');
+    // }
+  }, [error]);
+
   return (
     <div className="dark:bg-boxdark-2 dark:text-bodydark">
       {/* <!-- ===== Page Wrapper Start ===== --> */}

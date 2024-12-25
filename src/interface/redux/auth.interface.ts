@@ -12,7 +12,7 @@ export interface AuthDataProps {
 
 export interface UserDataProps {
     firstName: string;
-    lastname: string;
+    lastName: string;
     telegramId: string;
     phone: string;
     role: string;

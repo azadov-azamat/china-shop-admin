@@ -1,8 +1,14 @@
 import { useAppSelector } from '../../redux/hooks.ts';
+import { useNavigate } from 'react-router-dom';
 
 const ProductsTable = () => {
 
+  const navigate = useNavigate();
   const {products} = useAppSelector(state => state.product);
+
+  const navigateToProduct = (id: number) => {
+    navigate(`/products/${id}`);
+  }
 
   return (
     <div className="rounded-sm border border-stroke bg-white px-5 pt-6 pb-2.5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:pb-1">
@@ -44,7 +50,7 @@ const ProductsTable = () => {
                 </td>
                 <td className="border-b border-[#eee] py-5 px-4 dark:border-strokedark">
                   <div className="flex items-center space-x-3.5">
-                    <button className="hover:text-primary">
+                    <button className="hover:text-primary" onClick={() => navigateToProduct(item.id)}>
                       <svg
                         className="fill-current"
                         width="18"

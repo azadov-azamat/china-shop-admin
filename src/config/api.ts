@@ -1,4 +1,5 @@
 import axios from "axios";
+import { useNavigate } from 'react-router-dom';
 // import i18n from "../utils/i18n.ts";
 
 // @ts-ignore
@@ -25,6 +26,10 @@ http.interceptors.request.use((config) => {
     }
     return config;
 }, (error) => {
-    // Handle the error
+    console.error("error - 29", error);
+    if (error.response?.status === 401) {
+        const navigate = useNavigate();
+        navigate("/login");
+    }
     return Promise.reject(error);
 });
