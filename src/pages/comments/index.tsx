@@ -24,7 +24,7 @@ const CommentsController = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Users" />
+      <Breadcrumb pageName="Comments" />
 
       <div className="flex flex-col gap-10">
         <CommentsTable/>

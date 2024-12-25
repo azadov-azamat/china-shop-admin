@@ -24,7 +24,7 @@ const ProductsController = () => {
 
   return (
     <>
-      <Breadcrumb pageName="Users" />
+      <Breadcrumb pageName="Products" />
 
       <div className="flex flex-col gap-10">
         <ProductsTable/>
