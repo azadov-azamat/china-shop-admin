@@ -1,4 +1,5 @@
-import { Deserializer } from "jsonapi-serializer";
+import { Deserializer} from "jsonapi-serializer";
+
 import {AuthDataProps, AuthInitialProps} from "../interface/redux/auth.interface.ts";
 
 const DefaultDeserializer = new Deserializer({

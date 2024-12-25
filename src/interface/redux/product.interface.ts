@@ -1,5 +1,6 @@
 import { defaultKeys } from './variable.interface.ts';
 import { likeDataProps } from './like.interface.ts';
+import { mediaDataProps } from './media.interface.ts';
 
 export interface ProductInitialStateProps {
     loading: boolean;
@@ -18,6 +19,7 @@ export interface productDataProps extends defaultKeys {
     description: string;
     price: number;
     category: string;
-    sizes: string[];
+    sizes: string[] | [];
     like: likeDataProps | null;
+    media: mediaDataProps[] | [];
 }

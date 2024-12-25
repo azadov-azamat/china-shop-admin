@@ -78,6 +78,7 @@ export const productSlice = createSlice({
         })
 
         builder.addCase(getProductById.fulfilled, (state: ProductInitialStateProps, action) => {
+            console.log("action.payload", action.payload);
             state.product = action.payload
             state.loading = false
         })

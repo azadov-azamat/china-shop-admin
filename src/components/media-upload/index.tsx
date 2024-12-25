@@ -1,182 +1,143 @@
 import React, { useState, useRef } from 'react';
-import Croppr from 'croppr';
-import { useAppDispatch } from '../../redux/hooks.ts';
+import Sortable from 'sortablejs';
+import { ALLOWED_TYPES } from '../../utils/constants.ts';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks.ts';
+import { createMedia, getUploadUrl } from '../../redux/reducers/media.ts';
+import ImagePreview from '../image-preview';
 
-interface ModalMediaUploadProps {
-  data: {
-    model: any;
-    type: string;
-    contentType: string;
-  };
-  close?: () => void;
-  network: {
-    request: (url: string) => Promise<any>;
-  };
-  store: {
-    createRecord: (type: string, data: any) => any;
-  };
+interface MediaUploadComponentProps {
+  model: any;
+  type: string;
+  contentType: string;
 }
 
-const ModalMediaUpload: React.FC<ModalMediaUploadProps> = ({ data, close, network, store }) => {
+const MediaUploadComponent: React.FC<MediaUploadComponentProps> = ({ model, type, contentType }) => {
+  console.log(model);
   const dispatch = useAppDispatch();
-  const [cropprInstance, setCropprInstance] = useState<any>(null);
-  const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
+  const {uploadData, media: newMedia} = useAppSelector(state => state.media)
+  const [media, setMedia] = useState<any[]>(model?.media?.content ? model?.media.content.toArray() : model?.media);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const sortableContainerRef = useRef<HTMLUListElement | null>(null);
 
-  const mediaPath = () => {
-    const { model, contentType } = data;
-
-    if (model?.media) {
-      if (Array.isArray(model.media) && contentType) {
-        return (
-          model.media.find((media: any) => media.contentType === contentType)?.path ||
-          '/images/placeholder.webp'
-        );
-      }
-      return model.media?.path || '/images/placeholder.webp';
-    }
-    return '/images/placeholder.webp';
+  const validateFile = (file: File) => {
+    return ALLOWED_TYPES.includes(file.type);
   };
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
-  const uploadFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      const reader = new FileReader();
-      reader.onload = () => {
-        setImageSrc(reader.result as string);
-        setupCroppr();
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-  };
-
-  const setupCroppr = () => {
-    requestAnimationFrame(() => {
-      const instance = new Croppr('#crop-image', {
-        // aspectRatio: 3 / 4,
-        // Additional options...
+  React.useEffect(() => {
+    if (sortableContainerRef.current) {
+      Sortable.create(sortableContainerRef.current, {
+        animation: 150,
+        ghostClass: 'ghost',
+        chosenClass: 'chosen',
+        group: 'shared-list',
+        onEnd: onSortEnd,
       });
-      setCropprInstance(instance);
+    }
+  }, [media]);
+
+  const onSortEnd = async (event: any) => {
+    const updatedMedia = [...media];
+
+    event.to.childNodes.forEach((child: any, index: number) => {
+      const id = child.dataset.itemId;
+      const item = updatedMedia.find((mediaItem) => mediaItem.id === id);
+      if (item) {
+        item.order = index;
+      }
     });
+
+    setMedia(updatedMedia);
+
+    const promises = updatedMedia.map((item) => item.save());
+    await Promise.all(promises);
   };
 
-  const getCroppedImageBlob = (url: string, croppedData: any): Promise<Blob> => {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
+  const uploadPhoto = async (file: File) => {
+    const modelId = model?.id;
+    console.log("tushdi 2", modelId);
 
-      image.onload = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = croppedData.width;
-        canvas.height = croppedData.height;
-        const ctx = canvas.getContext('2d');
+    if (modelId) {
+      try {
+        await dispatch(getUploadUrl({type, modelId}))
 
-        ctx?.drawImage(
-          image,
-          croppedData.x,
-          croppedData.y,
-          croppedData.width,
-          croppedData.height,
-          0,
-          0,
-          croppedData.width,
-          croppedData.height
-        );
+        const { uploadUrl, id } = uploadData
+        console.log("uploadUrl", uploadUrl);
+        const response = await fetch(uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': file.type },
+          body: file,
+        });
 
-        canvas.toBlob(
-          (blob) => {
-            if (blob) resolve(blob);
-            URL.revokeObjectURL(url);
-          },
-          'image/png'
-        );
-      };
-
-      image.onerror = () => {
-        reject(new Error('Image loading error'));
-        URL.revokeObjectURL(url);
-      };
-
-      image.src = url;
-    });
-  };
-
-  const uploadCroppedImage = async (blob: Blob) => {
-    try {
-      const { model, type, contentType } = data;
-      const modelId = model?.id;
-
-      if (modelId) {
-        const { uploadUrl, id } = await network.request(
-          `media/upload-url/${type}?id=${modelId}`
-        );
-        await uploadBlob(blob, uploadUrl, blob.type);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
         const url = uploadUrl.split('?')[0];
 
-        const media = store.createRecord('media', {
+        await dispatch(createMedia({
           id,
           [type]: model,
           path: url,
           mediaType: 'photo',
           contentType,
-        });
+        }))
 
-        await media.save();
+        if (media?.length) {
+          setMedia([...media, newMedia])
+        } else {
+          setMedia([newMedia])
+        }
+      } catch (error) {
+        console.error('Error during photo upload:', error);
       }
-      close?.();
-    } catch (error) {
-      console.error('Error during photo upload:', error);
     }
   };
 
-  const uploadBlob = async (blob: Blob, uploadUrl: string, contentType: string) => {
-    const response = await fetch(uploadUrl, {
-      method: 'PUT',
-      headers: { 'Content-Type': contentType },
-      body: blob,
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-  };
-
-  const onSave = async () => {
-    if (!cropprInstance || !file) return;
-
-    const croppedData = cropprInstance.getValue();
-    const url = URL.createObjectURL(file);
-
-    try {
-      const blob = await getCroppedImageBlob(url, croppedData);
-      await uploadCroppedImage(blob);
-    } catch (error) {
-      console.error('Error in cropping image:', error);
+  const handleFileInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file && validateFile(file)) {
+      uploadPhoto(file);
     }
   };
 
   return (
-    <div>
-      <div>
-        <img id="crop-image" src={imageSrc || mediaPath()} alt="To crop" />
+    <div className="w-full max-w-4xl bg-white m-2.5">
+      <div className="mt-4 mb-4">
+        {media?.length > 0 ? (
+          <ul className="flex flex-wrap gap-2" ref={sortableContainerRef}>
+            {media.map((item) => (
+              <li key={item.id} data-item-id={item.id} className="list-item">
+                <ImagePreview
+                  media={item}
+                  onDelete={(id: string) => setMedia((prev) => prev.filter((m) => m.id !== id))}
+                  isDeleting={false}
+                />
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No media available</p>
+        )}
       </div>
-      <input
-        id="hidden-file-input"
-        type="file"
-        ref={fileInputRef}
-        style={{ display: 'none' }}
-        onChange={uploadFile}
-      />
-      <button onClick={triggerFileInput}>Upload File</button>
-      <button onClick={onSave}>Save</button>
+      <div
+        className="relative flex flex-col items-center justify-center h-44 border-2 border-dashed border-blue-200 rounded-lg cursor-pointer hover:border-blue-500 transition duration-300">
+        <span className="text-blue-500 text-6xl mb-2">📷</span>
+        <p className="text-gray-400 text-sm mt-2 transition-opacity duration-300">Drag & drop files here or click to
+          upload</p>
+        <input
+          type="file"
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+          ref={fileInputRef}
+          onChange={handleFileInput}
+          accept="image/*"
+        />
+      </div>
+      <p className="text-gray-400 text-sm mt-5">
+        Не допускаются к размещению фотографии с водяными знаками, чужих объектов и рекламные баннеры. JPG, PNG или GIF.
+        Максимальный размер файла 10 мб
+      </p>
     </div>
   );
 };
 
-export default ModalMediaUpload;
+export default MediaUploadComponent;

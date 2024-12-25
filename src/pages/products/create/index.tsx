@@ -8,6 +8,7 @@ import { Formik, Form, Field } from 'formik';
 import * as Yup from 'yup';
 import { createProduct, getProductById, updateProduct } from '../../../redux/reducers/product.ts';
 import { CATEGORIES, SIZES } from '../../../utils/constants.ts';
+import MediaUploadComponent from '../../../components/media-upload';
 
 const ProductCreateController = () => {
 
@@ -147,7 +148,7 @@ const ProductCreateController = () => {
                   <option value="" disabled>
                     Select category
                   </option>
-                  {CATEGORIES.map(item => <option value={item}>{item}</option>)}
+                  {CATEGORIES.map(item => <option key={item} value={item}>{item}</option>)}
                 </Field>
                 {errors.category && touched.category && (
                   <p className="text-red-500 text-sm mt-1">{errors.category}</p>
@@ -183,7 +184,7 @@ const ProductCreateController = () => {
                         type="checkbox"
                         name="sizes"
                         value={size}
-                        checked={values.sizes.includes(size)}
+                        checked={!!values.sizes.find(item => item === size)}
                         onChange={async (e) => {
                           if (e.target.checked) {
                             await setFieldValue('sizes', [...values.sizes, size]);
@@ -217,6 +218,7 @@ const ProductCreateController = () => {
             </Form>
           )}
         </Formik>
+        <MediaUploadComponent model={product} type={'product'} contentType={'photo'}/>
       </div>
     </>
   );
