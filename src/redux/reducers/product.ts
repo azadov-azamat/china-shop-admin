@@ -47,6 +47,16 @@ export const updateProduct = createAsyncThunk('product/updateProduct', async (da
     }
 });
 
+export const deleteProduct = createAsyncThunk('product/deleteProduct', async (id: number, {rejectWithValue}) => {
+    try {
+        const response = await http.delete(`/products/${id}`)
+        if (response.data === null) return rejectWithValue(response?.data)
+        return response.data
+    } catch (error) {
+        return rejectWithValue(error)
+    }
+});
+
 const initialState: ProductInitialStateProps = {
     products: [],
     product: null,
@@ -99,6 +109,19 @@ export const productSlice = createSlice({
             state.loading = true
         })
         builder.addCase(createProduct.rejected, (state: ProductInitialStateProps, action) => {
+            // state.product = null
+            state.loading = false
+            console.error(action.payload)
+        })
+
+        builder.addCase(deleteProduct.fulfilled, (state: ProductInitialStateProps, action) => {
+            state.products = state.products.filter(item => item.id !== Number(action.meta.arg));
+            state.loading = false
+        })
+        builder.addCase(deleteProduct.pending, (state: ProductInitialStateProps) => {
+            state.loading = true
+        })
+        builder.addCase(deleteProduct.rejected, (state: ProductInitialStateProps, action) => {
             // state.product = null
             state.loading = false
             console.error(action.payload)

@@ -7,6 +7,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import qs from 'qs';
 import { getProducts } from '../../redux/reducers/product.ts';
 import ProductsTable from '../../components/tables/products.tsx';
+import { MdOutlineCreateNewFolder } from 'react-icons/md';
 
 const ProductsController = () => {
 
@@ -26,9 +27,9 @@ const ProductsController = () => {
   return (
     <>
       <Breadcrumb pageName="Products" />
-      <div>
-        <button className={'text-primary'} onClick={() => naviate('/products/create')}>
-          +
+      <div className={'flex justify-end'}>
+        <button className={'px-3 py-1 flex items-center gap-2 text-primary'} onClick={() => naviate('/products/create')}>
+          Add <MdOutlineCreateNewFolder className="w-5 h-5" />
         </button>
       </div>
       <div className="flex flex-col gap-10">

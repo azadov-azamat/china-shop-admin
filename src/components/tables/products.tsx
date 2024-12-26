@@ -1,8 +1,10 @@
-import { useAppSelector } from '../../redux/hooks.ts';
+import { useAppDispatch, useAppSelector } from '../../redux/hooks.ts';
 import { useNavigate } from 'react-router-dom';
+import { deleteProduct } from '../../redux/reducers/product.ts';
 
 const ProductsTable = () => {
 
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const {products} = useAppSelector(state => state.product);
 
@@ -69,7 +71,7 @@ const ProductsTable = () => {
                         />
                       </svg>
                     </button>
-                    <button className="hover:text-primary">
+                    <button className="hover:text-primary" onClick={()=> dispatch(deleteProduct(item.id))}>
                       <svg
                         className="fill-current"
                         width="18"

@@ -218,7 +218,7 @@ const ProductCreateController = () => {
             </Form>
           )}
         </Formik>
-        <MediaUploadComponent model={product} type={'product'} contentType={'photo'}/>
+        {product?.id && <div className={'flex justify-center'}><MediaUploadComponent model={product} type={'product'} contentType={'photo'}/></div>}
       </div>
     </>
   );
