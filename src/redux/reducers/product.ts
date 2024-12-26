@@ -115,7 +115,7 @@ export const productSlice = createSlice({
         })
 
         builder.addCase(deleteProduct.fulfilled, (state: ProductInitialStateProps, action) => {
-            state.products = state.products.filter(item => item.id !== Number(action.meta.arg));
+            state.products = state.products.filter(item => Number(item.id) !== Number(action.meta.arg));
             state.loading = false
         })
         builder.addCase(deleteProduct.pending, (state: ProductInitialStateProps) => {
