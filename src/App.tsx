@@ -3,17 +3,6 @@ import { Route, Routes, useLocation, useNavigate } from 'react-router-dom';
 
 // import Loader from './common/Loader';
 import PageTitle from './components/PageTitle';
-import SignIn from './pages/Authentication/SignIn';
-import SignUp from './pages/Authentication/SignUp';
-// import Calendar from './pages/Calendar';
-import Chart from './pages/Chart';
-import FormElements from './pages/Form/FormElements';
-import FormLayout from './pages/Form/FormLayout';
-// import Profile from './pages/Profile';
-import Settings from './pages/Settings';
-// import Tables from './pages/Tables';
-import Alerts from './pages/UiElements/Alerts';
-import Buttons from './pages/UiElements/Buttons';
 import DefaultLayout from './layout/DefaultLayout';
 import UsersController from './pages/users';
 import LoginController from './pages/login';
@@ -24,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import 'react-toastify/scss/main.scss';
 import ProductCreateController from './pages/products/create';
 import { useAppSelector } from './redux/hooks.ts';
+import Profile from './pages/Profile.tsx';
 
 function App() {
   // const [loading, setLoading] = useState<boolean>(true);
@@ -69,37 +59,9 @@ function App() {
       component: <ProductCreateController />
     },
     {
-      path: '/forms/form-elements',
-      title: 'Form Elements | TailAdmin - Tailwind CSS Admin Dashboard Template',
-      component: <FormElements />
-    },
-    {
-      path: '/forms/form-layout',
-      title: 'Form Layout | TailAdmin - Tailwind CSS Admin Dashboard Template',
-      component: <FormLayout />
-    },
-    // { path: '/tables', title: 'tables | TailAdmin - Tailwind CSS Admin Dashboard Template', component: <Tables /> },
-    {
-      path: '/settings',
-      title: 'Settings | TailAdmin - Tailwind CSS Admin Dashboard Template',
-      component: <Settings />
-    },
-    { path: '/chart', title: 'Basic Chart | TailAdmin - Tailwind CSS Admin Dashboard Template', component: <Chart /> },
-    { path: '/ui/alerts', title: 'Alerts | TailAdmin - Tailwind CSS Admin Dashboard Template', component: <Alerts /> },
-    {
-      path: '/ui/buttons',
-      title: 'Buttons | TailAdmin - Tailwind CSS Admin Dashboard Template',
-      component: <Buttons />
-    },
-    {
-      path: '/auth/signin',
-      title: 'Signin | TailAdmin - Tailwind CSS Admin Dashboard Template',
-      component: <SignIn />
-    },
-    {
-      path: '/auth/signup',
-      title: 'Signup | TailAdmin - Tailwind CSS Admin Dashboard Template',
-      component: <SignUp />
+      path: '/profile',
+      title: 'Profile | TailAdmin - Tailwind CSS Admin Dashboard Template',
+      component: <Profile />
     }
   ];
 
